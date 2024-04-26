@@ -23,7 +23,7 @@ func RedirectDomain(w http.ResponseWriter, r *http.Request) {
 
 func CreateShortener(w http.ResponseWriter, r *http.Request) {
 	var NewURL Domain
-	json.NewDecoder(r.Body).Decode(&NewURL)
+	NewURL.Domain = r.URL.Query().Get("domain")
 	for {
 		UUID := RandomString(10)
 		for _, val := range DOMAIN_LIST {
