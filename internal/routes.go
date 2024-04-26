@@ -10,7 +10,7 @@ import (
 )
 
 func RedirectDomain(w http.ResponseWriter, r *http.Request) {
-	id, _ := mux.Vars(r)["id"]
+	id := mux.Vars(r)["id"]
 
 	for _, val := range DOMAIN_LIST {
 		if val.ID == id {
