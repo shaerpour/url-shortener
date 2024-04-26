@@ -36,5 +36,5 @@ func CreateShortener(w http.ResponseWriter, r *http.Request) {
 	}
 
 	DOMAIN_LIST = append(DOMAIN_LIST, NewURL)
-	fmt.Fprintf(w, "Shortend URL: %s/%s", os.Getenv("URL_SHORTENER_URL"), NewURL.ID)
+	fmt.Fprintf(w, "Shortend URL: http://%s/%s", os.Getenv("URL_SHORTENER_URL"), NewURL.ID)
 }
