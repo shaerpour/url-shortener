@@ -17,7 +17,7 @@ func main() {
 	r.HandleFunc("/add", CreateShortener).
 		Host(ListenURL).
 		Queries("domain", "").
-		Methods("POST")
+		Methods("GET")
 
 	r.HandleFunc("/{id}", RedirectDomain).
 		Host(ListenURL)
