@@ -3,14 +3,16 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
+    "os"
 
+    "github.com/joho/godotenv"
 	"github.com/gorilla/mux"
 	. "github.com/shaerpour/url-shortener/internal"
 )
 
 func main() {
-	r := mux.NewRouter()
+    r := mux.NewRouter()
+    godotenv.Load()
 	ListenAddr := os.Getenv("URL_SHORTENER_LISTENADDR")
 	ListenURL := os.Getenv("URL_SHORTENER_URL")
 
