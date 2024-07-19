@@ -8,6 +8,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+var DB *sql.DB
+
 type DBConfig struct {
 	Host   string
 	User   string
@@ -16,26 +18,7 @@ type DBConfig struct {
 }
 
 func InitDB() {
-	GetTableQuery := "SHOW TABLES"
-	var table string
-	db, err := OpenDB()
-	defer db.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	_ = db.QueryRow(GetTableQuery).Scan(&table)
-	if table != "" {
-		return
-	} else {
-		CreateTableQuery := "CREATE TABLE url_list (url varchar(255), randStr varchar(255))"
-		_, err = db.Exec(CreateTableQuery)
-	}
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func OpenDB() (*sql.DB, error) {
+	// Open new connetion to database
 	db := new(sql.DB)
 	var err error
 	var c = DBConfig{
@@ -48,21 +31,28 @@ func OpenDB() (*sql.DB, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pingErr := db.Ping()
-	if pingErr != nil {
+	if pingErr := db.Ping(); pingErr != nil {
 		log.Fatal(err)
 	}
-	return db, nil
+	DB = db // Create db connection pointer
+	// Create table if needed
+	GetTableQuery := "SHOW TABLES"
+	var table string
+	_ = DB.QueryRow(GetTableQuery).Scan(&table)
+	if table != "" {
+
+	} else {
+		CreateTableQuery := "CREATE TABLE url_list (url varchar(255), randStr varchar(255))"
+		_, err := DB.Exec(CreateTableQuery)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 }
 
 func AddDomain(url, randStr string) error {
 	query := "INSERT INTO url_list (url, randStr) VALUES (?, ?)"
-	db, err := OpenDB()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-	_, err = db.Exec(query, url, randStr)
+	_, err := DB.Exec(query, url, randStr)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,36 +62,24 @@ func AddDomain(url, randStr string) error {
 func GetDomainByStr(randStr string) (string, error) {
 	var url string
 	query := "SELECT url FROM url_list WHERE randStr = ?"
-	db, err := OpenDB()
-	defer db.Close()
+	err := DB.QueryRow(query, randStr).Scan(&url)
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = db.QueryRow(query, randStr).Scan(&url)
 	return url, nil
 }
 
 func GetStrByDomain(url string) (string, error) {
 	var randStr string
 	query := "SELECT url FROM url_list WHERE url = ?"
-	db, err := OpenDB()
-	defer db.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	_ = db.QueryRow(query, url).Scan(&randStr)
+	_ = DB.QueryRow(query, url).Scan(&randStr)
 	return randStr, nil
 }
 
 func GetAllDomains() []string {
 	var ListOfURLs []string
 	query := "SELECT randStr FROM url_list"
-	db, err := OpenDB()
-	defer db.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	rows, err := db.Query(query)
+	rows, err := DB.Query(query)
 	if err != nil {
 		log.Fatal(err)
 	}
