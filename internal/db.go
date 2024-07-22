@@ -54,7 +54,7 @@ func AddDomain(url, randStr string) error {
 	query := "INSERT INTO url_list (url, randStr) VALUES (?, ?)"
 	_, err := DB.Exec(query, url, randStr)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	return nil
 }
@@ -62,16 +62,13 @@ func AddDomain(url, randStr string) error {
 func GetDomainByStr(randStr string) (string, error) {
 	var url string
 	query := "SELECT url FROM url_list WHERE randStr = ?"
-	err := DB.QueryRow(query, randStr).Scan(&url)
-	if err != nil {
-		log.Fatal(err)
-	}
+	_ = DB.QueryRow(query, randStr).Scan(&url)
 	return url, nil
 }
 
 func GetStrByDomain(url string) (string, error) {
 	var randStr string
-	query := "SELECT url FROM url_list WHERE url = ?"
+	query := "SELECT randStr FROM url_list WHERE url = ?"
 	_ = DB.QueryRow(query, url).Scan(&randStr)
 	return randStr, nil
 }
