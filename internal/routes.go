@@ -1,7 +1,8 @@
 package internal
 
 import (
-	"fmt"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -9,6 +10,8 @@ import (
 
 	"github.com/gorilla/mux"
 )
+
+type jsonMessage map[string]string
 
 func RedirectDomain(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
@@ -21,9 +24,20 @@ func RedirectDomain(w http.ResponseWriter, r *http.Request) {
 
 func CreateShortener(w http.ResponseWriter, r *http.Request) {
 	var NewURL Domain
-	NewURL.Domain = r.URL.Query().Get("domain")
+	resp, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = json.Unmarshal(resp, &NewURL)
+	if err != nil {
+		log.Fatal(err)
+	}
 	if id, _ := GetStrByDomain(NewURL.Domain); id != "" {
-		fmt.Fprintf(w, "The domain has been created! Send another domain")
+		json.NewEncoder(w).Encode(jsonMessage{
+			"status":  "406",
+			"message": "Domain already shortend",
+		})
 	} else {
 		for {
 			id = RandomString(10)
@@ -38,6 +52,9 @@ func CreateShortener(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Fprintf(w, "Shortend URL: http://%s/%s\n", os.Getenv("URL_SHORTENER_URL"), NewURL.ID)
+		json.NewEncoder(w).Encode(jsonMessage{
+			"status":  "200",
+			"message": "http://" + os.Getenv("URL_SHORTENER_URL") + "/" + NewURL.ID,
+		})
 	}
 }
