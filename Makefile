@@ -4,4 +4,8 @@ make_arch = $(shell uname -m)
 
 .PHONY: build
 build:
-	GOARCH=$(make_arch) ${CMD} build -o ${PACKAGE_NAME}
+	@GOARCH=$(make_arch) ${CMD} build -o ${PACKAGE_NAME}
+
+.PHONY: run
+run: build
+	@${CMD} run .
