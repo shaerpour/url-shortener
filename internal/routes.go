@@ -14,6 +14,7 @@ import (
 type jsonMessage struct {
 	Status  int    `json:"status",omitempty`
 	Message string `json:"message",omitempty`
+	Url     string `json:"url",omitempty`
 }
 
 func RedirectDomain(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +28,7 @@ func RedirectDomain(w http.ResponseWriter, r *http.Request) {
 
 func CreateShortener(w http.ResponseWriter, r *http.Request) {
 	var NewURL Domain
-	cors := os.Getenv("URL_SHORTENER_URL")
+	cors := "*"
 	resp, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -40,8 +41,9 @@ func CreateShortener(w http.ResponseWriter, r *http.Request) {
 	if id, _ := GetStrByDomain(NewURL.Domain); id != "" {
 		w.Header().Set("Access-Control-Allow-Origin", cors)
 		json.NewEncoder(w).Encode(jsonMessage{
-			Status:  406,
+			Status:  302,
 			Message: "Domain already shortend",
+			Url:     os.Getenv("URL_SHORTENER_URL") + "/" + id,
 		})
 	} else {
 		for {
@@ -59,8 +61,9 @@ func CreateShortener(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Header().Set("Access-Control-Allow-Origin", cors)
 		json.NewEncoder(w).Encode(jsonMessage{
-			Status:  200,
-			Message: "http://" + os.Getenv("URL_SHORTENER_URL") + "/" + NewURL.ID,
+			Status:  201,
+			Message: "Shortend url created successfully",
+			Url:     os.Getenv("URL_SHORTENER_URL") + "/" + NewURL.ID,
 		})
 	}
 }
