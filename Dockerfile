@@ -16,8 +16,6 @@ WORKDIR /app
 
 COPY --from=builder /usr/src/app/url-shortener /app/url-shortener
 
-COPY .env /app/.env
-
 EXPOSE 8080
 
 ENTRYPOINT ["/app/url-shortener"]
