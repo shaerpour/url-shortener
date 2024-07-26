@@ -8,9 +8,9 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-RUN go build -o /usr/src/app/url-shortener
+RUN CGO_ENABLED=0 GOOS=linux go build -o /usr/src/app/url-shortener
 
-FROM scratch
+FROM alpine:latest
 
 WORKDIR /app
 
