@@ -8,6 +8,10 @@ services:
       - "127.0.0.1:8080:8080"
     env_file:
       - ".env"
+    depends_on:
+      mysql:
+        condition: "service_healthy"
+        restart: true
   mysql:
     image: "mysql:8.0.0"
     container_name: "mysql"
@@ -16,3 +20,8 @@ services:
       MYSQL_PASSWORD: "password"
       MYSQL_DATABASE: "url_shortener"
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
