@@ -18,14 +18,11 @@ func init() {
 func main() {
 	r := mux.NewRouter()
 	ListenAddr := os.Getenv("URL_SHORTENER_LISTENADDR")
-	ListenURL := os.Getenv("URL_SHORTENER_URL")
 
 	r.HandleFunc("/add", CreateShortener).
-		Host(ListenURL).
 		Methods("POST")
 
-	r.HandleFunc("/{id}", RedirectDomain).
-		Host(ListenURL)
+	r.HandleFunc("/{id}", RedirectDomain)
 
 	fmt.Println("Running server ...")
 	http.ListenAndServe(ListenAddr, r)
