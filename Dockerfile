@@ -8,11 +8,9 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-ARG ARCH
+RUN go build -o /usr/src/app/url-shortener
 
-RUN GOARCH=${ARCH} go build -o /usr/src/app/url-shortener
-
-FROM alpine
+FROM scratch
 
 WORKDIR /app
 
