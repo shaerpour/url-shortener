@@ -9,9 +9,7 @@ services:
     env_file:
       - ".env"
     depends_on:
-      mysql:
-        condition: "service_healthy"
-        restart: true
+      - mysql
   mysql:
     image: "mysql:8.0.0"
     container_name: "mysql"
