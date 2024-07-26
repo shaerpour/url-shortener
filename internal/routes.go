@@ -11,7 +11,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type jsonMessage map[string]string
+type jsonMessage struct {
+	Status  int    `json:"status",omitempty`
+	Message string `json:"message",omitempty`
+}
 
 func RedirectDomain(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
@@ -24,6 +27,7 @@ func RedirectDomain(w http.ResponseWriter, r *http.Request) {
 
 func CreateShortener(w http.ResponseWriter, r *http.Request) {
 	var NewURL Domain
+	cors := os.Getenv("URL_SHORTENER_URL")
 	resp, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -34,9 +38,10 @@ func CreateShortener(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	if id, _ := GetStrByDomain(NewURL.Domain); id != "" {
+		w.Header().Set("Access-Control-Allow-Origin", cors)
 		json.NewEncoder(w).Encode(jsonMessage{
-			"status":  "406",
-			"message": "Domain already shortend",
+			Status:  406,
+			Message: "Domain already shortend",
 		})
 	} else {
 		for {
@@ -52,9 +57,10 @@ func CreateShortener(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
+		w.Header().Set("Access-Control-Allow-Origin", cors)
 		json.NewEncoder(w).Encode(jsonMessage{
-			"status":  "200",
-			"message": "http://" + os.Getenv("URL_SHORTENER_URL") + "/" + NewURL.ID,
+			Status:  200,
+			Message: "http://" + os.Getenv("URL_SHORTENER_URL") + "/" + NewURL.ID,
 		})
 	}
 }
