@@ -42,7 +42,7 @@ func InitDB() {
 	if table != "" {
 		return
 	} else {
-		CreateTableQuery := "CREATE TABLE url_list (url varchar(255), randStr varchar(255))"
+		CreateTableQuery := "CREATE TABLE IF NOT EXISTS url_list (url varchar(255), randStr varchar(255))"
 		_, err := DB.Exec(CreateTableQuery)
 		if err != nil {
 			log.Fatal(err)
