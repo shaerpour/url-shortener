@@ -40,7 +40,7 @@ func InitDB() {
 	var table string
 	_ = DB.QueryRow(GetTableQuery).Scan(&table)
 	if table != "" {
-
+		return
 	} else {
 		CreateTableQuery := "CREATE TABLE url_list (url varchar(255), randStr varchar(255))"
 		_, err := DB.Exec(CreateTableQuery)
